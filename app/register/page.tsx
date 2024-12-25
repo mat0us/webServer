@@ -9,8 +9,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { LeafIcon, ArrowLeftIcon } from 'lucide-react'; // Přidáno ArrowLeftIcon
+import { ArrowLeftIcon } from 'lucide-react'; // Přidáno ArrowLeftIcon
 import Link from 'next/link'; // Import pro Link
+import { Logo } from "@/components/ui/Logo";
 
 export default function Register() {
   const [name, setName] = useState('');
@@ -49,7 +50,7 @@ export default function Register() {
         </Link>
         <CardHeader className="space-y-1">
           <div className="flex items-center justify-center mb-4">
-            <LeafIcon className="w-12 h-12 text-green-500" />
+            <Logo size={48} className="text-green-500" />
           </div>
           <CardTitle className="text-2xl text-center">Registrace</CardTitle>
           <CardDescription className="text-center">

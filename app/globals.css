@@ -6,6 +6,9 @@
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
   --background-end-rgb: 255, 255, 255;
+  --brand-primary: #22c55e;
+  --brand-secondary: #16a34a;
+  --brand-background: #f0fdf4;
 }
 
 @media (prefers-color-scheme: light) {
@@ -106,4 +109,81 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Styly pro časový input */
+input[type="time"] {
+  position: relative;
+  padding-right: 2.5rem; /* Prostor pro ikonku */
+}
+
+/* Styly pro rozbalovací nabídku času */
+input[type="time"]::-webkit-calendar-picker-indicator {
+  background: transparent;
+  bottom: 0;
+  color: transparent;
+  cursor: pointer;
+  height: auto;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: auto;
+}
+
+/* Styly pro vybraný čas v rozbalovací nabídce */
+input[type="time"]::-webkit-time-picker-hour-field:focus,
+input[type="time"]::-webkit-time-picker-minute-field:focus {
+  background-color: #22c55e; /* zelená barva */
+  color: white;
+  border-radius: 4px;
+}
+
+/* Hover efekt pro časový input */
+.time-input-wrapper {
+  position: relative;
+}
+
+.time-input-wrapper::after {
+  content: "Klikněte pro výběr času";
+  position: absolute;
+  bottom: -25px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #333;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  opacity: 0;
+  transition: opacity 0.2s;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.time-input-wrapper:hover::after {
+  opacity: 1;
+}
+
+.bg-brand-gradient {
+  background: linear-gradient(to bottom, var(--brand-background), white);
+}
+
+@keyframes pulse-scale {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+}
+
+.animate-pulse-scale {
+  animation: pulse-scale 1.5s ease-in-out infinite;
 }

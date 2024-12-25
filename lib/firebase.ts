@@ -1,6 +1,8 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import { getDatabase } from 'firebase/database'; // Import pro Realtime Database
+import { getDatabase } from 'firebase/database';
+import { getFirestore } from 'firebase/firestore';
+import { getAnalytics } from 'firebase/analytics';
 
 const firebaseConfig = {
   apiKey: "AIzaSyBcowRCZPE4oTfox2Be5EhT9or2wwvNEeI",
@@ -13,9 +15,15 @@ const firebaseConfig = {
   measurementId: "G-LD251K7ZMB"
 };
 
-// Inicializace Firebase aplikace
-const app = initializeApp(firebaseConfig);
+export const app = initializeApp(firebaseConfig);
+export const auth = getAuth(app);
+export const realtimeDb = getDatabase(app); // Pro kontroly a stavy
+export const firestoreDb = getFirestore(app); // Pro data měření
+export const analytics = typeof window !== 'undefined' ? getAnalytics(app) : null;
 
-// Získání instancí pro autentizaci a databázi
-export const auth = getAuth(app); // Exportování autentizace
-export const db = getDatabase(app); // Exportování instance Realtime Database
+if (typeof window !== 'undefined') {
+  import('firebase/auth');
+  import('firebase/database');
+  import('firebase/firestore');
+  import('firebase/analytics');
+}

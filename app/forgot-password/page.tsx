@@ -7,8 +7,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { LeafIcon, ArrowLeft } from 'lucide-react'; // Přidána ikona šipky
+import { ArrowLeft, ArrowLeftIcon } from 'lucide-react'; // Přidána ikona šipky
 import { useRouter } from 'next/navigation';
+import { Logo } from "@/components/ui/Logo";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState('');
@@ -34,12 +35,11 @@ export default function ForgotPassword() {
         <CardHeader className="space-y-1">
           <div className="flex items-center justify-between mb-4">
             <button onClick={() => router.push('/login')} className="flex items-center">
-              <ArrowLeft className="w-6 h-6 text-green-500 mr-2" /> {/* Šipka zpět */}
-              Zpět na přihlášení
+              <ArrowLeftIcon className="w-6 h-6" />
             </button>
           </div>
           <div className="flex items-center justify-center mb-4">
-            <LeafIcon className="w-12 h-12 text-green-500" />
+            <Logo size={48} className="text-green-500" />
           </div>
           <CardTitle className="text-2xl text-center">Obnovení hesla</CardTitle>
           <CardDescription className="text-center">

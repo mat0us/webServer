@@ -1,0 +1,17 @@
+{
+  "name": "HydroLeaf",
+  "short_name": "HydroLeaf",
+  "description": "Ovládání hydroponického systému",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#22c55e",
+  "icons": [
+    {
+      "src": "/icons/logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+} 
