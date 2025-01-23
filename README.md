@@ -1,25 +1,86 @@
-# HydroLeaf Dashboard
+# HydroLeaf 🌱
 
-HydroLeaf Dashboard je mobilní aplikace pro monitorování a správu hydroponického systému pomocí ESP32, Firebase a dalších nástrojů. Tento projekt slouží jako ovládací panel pro správu zařízení a sledování údajů o senzorech, jako je pH, EC, teplota a úroveň vody.
+A modern, feature-rich web application built with Next.js and enhanced with beautiful UI components.
 
-## Funkce
+## 🚀 Features
 
-- **Sledování dat senzorů:** Zobrazení aktuálních hodnot pH, EC, teploty, a hladiny vody.
-- **Historická data:** Graf zobrazující historii vybraných senzorů.
-- **Ovládání zařízení:** Zapnutí a vypnutí zařízení (např. LED a čerpadlo).
-- **Nastavení a uložení hodnot:** Možnost změnit hodnoty senzorů a uložit je do Firebase.
+- Modern, responsive design using Radix UI components
+- Built with Next.js 13+ and TypeScript
+- Firebase Authentication integration
+- Beautiful UI components with shadcn/ui
+- Form handling with React Hook Form
+- Date handling with date-fns
+- Carousel functionality with Embla Carousel
+- Fully customizable with Tailwind CSS
 
-## Požadavky
+## 🛠️ Tech Stack
 
-- **Firebase**: Pro ukládání a načítání dat senzorů.
-- **Next.js**: Frontend framework pro uživatelské rozhraní.
-- **React**: Pro komponentově orientovaný vývoj frontend části.
-- **Firebase Realtime Database**: Pro ukládání dat.
-- **Node.js a npm**: Pro správu balíčků a spuštění vývojového prostředí.
+- **Framework:** Next.js 13+
+- **Language:** TypeScript
+- **Styling:** Tailwind CSS
+- **UI Components:** Radix UI
+- **Authentication:** Firebase Auth
+- **Form Handling:** React Hook Form
+- **Date Management:** date-fns
+- **Linting:** ESLint
+- **Package Manager:** npm
 
-## Instalace
+## 🏃‍♂️ Getting Started
 
-1. Naklonujte repozitář:
+1. **Clone the repository**
    ```bash
    git clone https://github.com/vase-uzivatelske-jmeno/hydroleaf-dashboard.git
+   cd hydroleaf-dashboard
    ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Run the development server**
+   ```bash
+   npm run dev
+   ```
+
+4. **Build for production**
+   ```bash
+   npm run build
+   ```
+
+5. **Start production server**
+   ```bash
+   npm start
+   ```
+
+## 🔧 Available Scripts
+
+- `npm run dev` - Run development server
+- `npm run build` - Build for production
+- `npm start` - Start production server
+- `npm run lint` - Run ESLint
+
+## 📁 Project Structure
+
+```
+hydroleaf-dashboard/
+├── app/           # Next.js app directory
+├── components/    # React components
+├── hooks/         # Custom React hooks
+├── lib/           # Utility functions and configurations
+├── public/        # Static assets
+└── styles/        # Global styles and Tailwind configuration
+```
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](./LICENCE) file for details.
+
+## 🤝 Contributing
+
+Contributions are welcome! Feel free to open issues and submit pull requests.
+
+## 📫 Contact
+
+- Email: chmatous@gmail.com
+- GitHub: [@mat0us](https://github.com/mat0us)
