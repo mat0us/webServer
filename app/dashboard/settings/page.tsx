@@ -17,6 +17,8 @@ import { useEffect } from "react";
 interface TimeRange {
   startTime: string;
   endTime: string;
+  isPeriodic?: boolean;
+  periodicity?: number; // in minutes
 }
 
 interface SettingsPageProps {
@@ -93,7 +95,7 @@ export default function SettingsPage({
     }
   };
 
-  const handleTimeRangeAdd = async (deviceKey: DeviceControlKey, range: TimeRange) => {
+  const handleTimeRangeAdd = async (deviceKey: DeviceControlKey, range: TimeRange | TimeRange[]) => {
     try {
       if (!isTimeControl(deviceKey)) return;
       
@@ -104,9 +106,14 @@ export default function SettingsPage({
         `devices/${deviceId}/configuration/control/${deviceKey}`
       );
 
+      // Handle both single range and array of ranges
+      const newRanges = Array.isArray(range) 
+        ? [...currentRanges, ...range]
+        : [...currentRanges, range];
+
       await set(controlRef, {
         ...device,
-        timeRanges: [...currentRanges, range],
+        timeRanges: newRanges,
       });
     } catch (error) {
       console.error("Chyba při přidání časového intervalu:", error);

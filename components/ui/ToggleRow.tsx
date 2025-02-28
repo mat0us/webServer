@@ -4,6 +4,8 @@ import Switch from "./switchProps";
 interface TimeRange {
   startTime: string;
   endTime: string;
+  isPeriodic?: boolean;
+  periodicity?: number; // in minutes
 }
 
 interface ToggleRowProps {
@@ -15,7 +17,7 @@ interface ToggleRowProps {
   mode: "timeRange" | "peristaltic";
   runTime?: number; // in seconds for peristaltic pump
   onRunTimeChange?: (seconds: number) => void;
-  onTimeRangeAdd?: (range: TimeRange) => void;
+  onTimeRangeAdd?: (range: TimeRange[]) => void;
   onTimeRangeDelete?: (index: number) => void;
   onConfirm?: () => void;
 }
@@ -54,14 +56,31 @@ const ToggleRow: React.FC<ToggleRowProps> = ({
     };
   }, [isRunning, runTime, mode, onToggle]);
 
+  const timeToMinutes = (time: string): number => {
+    const [hours, minutes] = time.split(':').map(Number);
+    return hours * 60 + minutes;
+  };
+
   const validateTimeRanges = (ranges: TimeRange[], newRange?: TimeRange): boolean => {
-    const allRanges = newRange ? [...ranges, newRange] : ranges;
+    // If this is a periodic range, we'll validate it differently
+    if (newRange?.isPeriodic) {
+      // For periodic ranges, just check that start time is before end time
+      if (timeToMinutes(newRange.startTime) >= timeToMinutes(newRange.endTime)) {
+        setError("Počáteční čas musí být před koncovým časem");
+        return false;
+      }
+      
+      // Check that periodicity is valid
+      if (!newRange.periodicity || newRange.periodicity <= 0) {
+        setError("Délka intervalu musí být větší než 0");
+        return false;
+      }
+      
+      setError(null);
+      return true;
+    }
     
-    // Convert time strings to minutes for easier comparison
-    const timeToMinutes = (time: string): number => {
-      const [hours, minutes] = time.split(':').map(Number);
-      return hours * 60 + minutes;
-    };
+    const allRanges = newRange ? [...ranges, newRange] : ranges;
 
     // Sort ranges by start time
     const sortedRanges = [...allRanges].sort((a, b) => 
@@ -92,7 +111,12 @@ const ToggleRow: React.FC<ToggleRowProps> = ({
   };
 
   const handleTimeRangeAdd = () => {
-    setPendingTimeRange({ startTime: "00:00", endTime: "00:00" });
+    setPendingTimeRange({ 
+      startTime: "00:00", 
+      endTime: "00:00", 
+      isPeriodic: false, 
+      periodicity: 60 // Default to 1 hour
+    });
     setCurrentRange(timeRanges.length);
   };
 
@@ -125,9 +149,79 @@ const ToggleRow: React.FC<ToggleRowProps> = ({
     }
   };
 
+  const handlePeriodicityChange = (value: string) => {
+    if (pendingTimeRange) {
+      const newRange = {
+        ...pendingTimeRange,
+        periodicity: parseInt(value),
+      };
+      setPendingTimeRange(newRange);
+    } else {
+      const newRanges = [...timeRanges];
+      newRanges[currentRange] = {
+        ...newRanges[currentRange],
+        periodicity: parseInt(value),
+      };
+      onToggle(isChecked, newRanges);
+      setHasChanges(true);
+    }
+  };
+
+  const handleIsPeriodicChange = () => {
+    if (pendingTimeRange) {
+      const newRange = {
+        ...pendingTimeRange,
+        isPeriodic: !pendingTimeRange.isPeriodic,
+      };
+      setPendingTimeRange(newRange);
+    } else {
+      const newRanges = [...timeRanges];
+      newRanges[currentRange] = {
+        ...newRanges[currentRange],
+        isPeriodic: !newRanges[currentRange].isPeriodic,
+      };
+      onToggle(isChecked, newRanges);
+      setHasChanges(true);
+    }
+  };
+
   const handleConfirmNewRange = () => {
     if (pendingTimeRange && onTimeRangeAdd && validateTimeRanges(timeRanges, pendingTimeRange)) {
-      onTimeRangeAdd(pendingTimeRange);
+      if (pendingTimeRange.isPeriodic && pendingTimeRange.periodicity) {
+        // Create periodic intervals
+        const startMinutes = timeToMinutes(pendingTimeRange.startTime);
+        const endMinutes = timeToMinutes(pendingTimeRange.endTime);
+        
+        // Create intervals based on periodicity
+        const intervals = [];
+        let currentStart = startMinutes;
+        
+        // For each interval, we'll create an active period followed by an inactive period
+        // The total duration of one cycle is 2 * periodicity
+        while (currentStart < endMinutes) {
+          // Calculate the end of this active period
+          const currentEnd = Math.min(currentStart + pendingTimeRange.periodicity, endMinutes);
+          
+          // Only add the interval if it fits completely within the range
+          if (currentEnd <= endMinutes) {
+            intervals.push({
+              startTime: minutesToTime(currentStart),
+              endTime: minutesToTime(currentEnd),
+              isPeriodic: false // Individual intervals are not periodic
+            });
+          }
+          
+          // Move to the start of the next active period (skip one periodicity for the gap)
+          currentStart += pendingTimeRange.periodicity * 2;
+        }
+        
+        // Add all intervals at once
+        onTimeRangeAdd(intervals);
+      } else {
+        // Add single interval
+        onTimeRangeAdd([pendingTimeRange]);
+      }
+      
       setPendingTimeRange(null);
       setHasChanges(true);
     }
@@ -152,6 +246,12 @@ const ToggleRow: React.FC<ToggleRowProps> = ({
       onRunTimeChange(newTime);
       setEditingTime(false);
     }
+  };
+
+  const minutesToTime = (totalMinutes: number): string => {
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
   };
 
   if (mode === "peristaltic") {
@@ -243,7 +343,7 @@ const ToggleRow: React.FC<ToggleRowProps> = ({
                     →
                   </button>
                 </div>
-                <div className="flex gap-4">
+                <div className="flex gap-4 mb-4">
                   <div className="flex-1">
                     <label className="block text-sm mb-1">Od:</label>
                     <input
@@ -263,6 +363,97 @@ const ToggleRow: React.FC<ToggleRowProps> = ({
                     />
                   </div>
                 </div>
+                
+                <div className="flex items-center mb-4">
+                  <input
+                    type="checkbox"
+                    id={`periodic-${title}`}
+                    checked={pendingTimeRange?.isPeriodic || timeRanges[currentRange]?.isPeriodic || false}
+                    onChange={handleIsPeriodicChange}
+                    className="mr-2 h-4 w-4 border-green-500 rounded"
+                  />
+                  <label htmlFor={`periodic-${title}`} className="text-sm">
+                    Vytvořit periodické intervaly s pauzami
+                  </label>
+                </div>
+                
+                {(pendingTimeRange?.isPeriodic || timeRanges[currentRange]?.isPeriodic) && (
+                  <div className="mb-4">
+                    <label className="block text-sm mb-1">Délka intervalu (minuty):</label>
+                    <div className="flex gap-2 items-center">
+                      <input
+                        type="number"
+                        min="1"
+                        max="1440"
+                        value={pendingTimeRange?.periodicity || timeRanges[currentRange]?.periodicity || 60}
+                        className="w-24 p-2 border border-green-500 rounded bg-transparent"
+                        onChange={(e) => handlePeriodicityChange(e.target.value)}
+                      />
+                      <span className="text-sm text-gray-500">minut</span>
+                      
+                      <select 
+                        className="ml-4 p-2 border border-green-500 rounded bg-transparent"
+                        value={pendingTimeRange?.periodicity || timeRanges[currentRange]?.periodicity || 60}
+                        onChange={(e) => handlePeriodicityChange(e.target.value)}
+                      >
+                        <option value="30">30 minut</option>
+                        <option value="60">1 hodina</option>
+                        <option value="120">2 hodiny</option>
+                        <option value="180">3 hodiny</option>
+                        <option value="240">4 hodiny</option>
+                      </select>
+                    </div>
+                    
+                    {(() => {
+                      const startTime = pendingTimeRange?.startTime || timeRanges[currentRange]?.startTime || "00:00";
+                      const endTime = pendingTimeRange?.endTime || timeRanges[currentRange]?.endTime || "00:00";
+                      const periodicity = pendingTimeRange?.periodicity || timeRanges[currentRange]?.periodicity || 60;
+                      
+                      const startMinutes = timeToMinutes(startTime);
+                      const endMinutes = timeToMinutes(endTime);
+                      const totalMinutes = endMinutes - startMinutes;
+                      
+                      if (totalMinutes <= 0) return null;
+                      
+                      // Calculate how many complete intervals will fit
+                      // Each cycle is 2 * periodicity (active + inactive)
+                      const intervalCount = Math.floor(totalMinutes / (periodicity * 2));
+                      // Add one more if there's room for at least one more active period
+                      const extraInterval = (totalMinutes % (periodicity * 2) >= periodicity) ? 1 : 0;
+                      const totalIntervals = intervalCount + extraInterval;
+                      
+                      return (
+                        <div className="mt-2">
+                          <p className="text-xs text-gray-500">
+                            Vytvoří se přibližně {totalIntervals} intervalů od {startTime} do {endTime} s délkou {periodicity} minut, mezi kterými budou pauzy stejné délky.
+                          </p>
+                          <div className="mt-2 text-xs text-gray-500">
+                            <strong>Náhled intervalů:</strong>
+                            <ul className="mt-1 pl-4 list-disc">
+                              {Array.from({ length: Math.min(totalIntervals, 5) }).map((_, i) => {
+                                // Each interval starts at startMinutes + (i * periodicity * 2)
+                                const intervalStart = startMinutes + (i * periodicity * 2);
+                                const intervalEnd = Math.min(intervalStart + periodicity, endMinutes);
+                                
+                                // Only show intervals that fit within the range
+                                if (intervalStart < endMinutes) {
+                                  return (
+                                    <li key={i}>
+                                      {minutesToTime(intervalStart)} - {minutesToTime(intervalEnd)}
+                                    </li>
+                                  );
+                                }
+                                return null;
+                              })}
+                              {totalIntervals > 5 && <li>...</li>}
+                            </ul>
+                          </div>
+                        </div>
+                      );
+                    })()}
+                  </div>
+                )}
+                
                 {error && (
                   <div className="mt-2 text-red-500 text-sm">
                     {error}
