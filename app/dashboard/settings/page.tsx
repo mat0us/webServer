@@ -12,6 +12,12 @@ import {
 } from "@/lib/types/device";
 import { ref, set } from "firebase/database";
 import { realtimeDb } from "@/lib/firebase";
+import { useEffect } from "react";
+
+interface TimeRange {
+  startTime: string;
+  endTime: string;
+}
 
 interface SettingsPageProps {
   sensorData: Device;
@@ -22,12 +28,45 @@ export default function SettingsPage({
   sensorData,
   deviceId,
 }: SettingsPageProps) {
+  const getDefaultDevice = (key: DeviceControlKey) => {
+    if (isTimeControl(key)) {
+      return {
+        state: false,
+        timeRanges: []
+      };
+    } else {
+      return {
+        state: false,
+        delay: "10" // 10 seconds default for all peristaltic pumps
+      };
+    }
+  };
+
+  useEffect(() => {
+    const initializeDevices = async () => {
+      try {
+        for (const key of delayControlDevices) {
+          const device = sensorData.configuration.control[key];
+          if (!device) {
+            const controlRef = ref(
+              realtimeDb,
+              `devices/${deviceId}/configuration/control/${key}`
+            );
+            await set(controlRef, getDefaultDevice(key));
+          }
+        }
+      } catch (error) {
+        console.error("Chyba při inicializaci zařízení:", error);
+      }
+    };
+
+    initializeDevices();
+  }, [deviceId, sensorData]);
+
   const handleDeviceUpdate = async (
     deviceKey: DeviceControlKey,
     isChecked: boolean,
-    timeMode?: "always" | "time",
-    timeFrom?: string,
-    timeTo?: string
+    timeRanges?: TimeRange[]
   ) => {
     try {
       const controlRef = ref(
@@ -35,27 +74,15 @@ export default function SettingsPage({
         `devices/${deviceId}/configuration/control/${deviceKey}`
       );
 
-      const device = sensorData.configuration.control[deviceKey];
+      const device = sensorData.configuration.control[deviceKey] || getDefaultDevice(deviceKey);
 
       if (isTimeControl(deviceKey)) {
         await set(controlRef, {
           ...device,
           state: isChecked,
-          ...(timeMode === "always"
-            ? {
-                startTime: "00:00",
-                endTime: "23:59",
-                isAllDay: true,
-              }
-            : timeFrom && timeTo
-            ? {
-                startTime: timeFrom,
-                endTime: timeTo,
-                isAllDay: false,
-              }
-            : {}),
+          timeRanges: timeRanges || [],
         });
-      } else {
+      } else if (isDelayControl(deviceKey)) {
         await set(controlRef, {
           ...device,
           state: isChecked,
@@ -66,25 +93,77 @@ export default function SettingsPage({
     }
   };
 
-  const handleDelayUpdate = async (
-    deviceKey: DeviceControlKey,
-    delay: string
-  ) => {
+  const handleTimeRangeAdd = async (deviceKey: DeviceControlKey, range: TimeRange) => {
     try {
+      if (!isTimeControl(deviceKey)) return;
+      
+      const device = sensorData.configuration.control[deviceKey] || getDefaultDevice(deviceKey);
+      const currentRanges = device.timeRanges || [];
       const controlRef = ref(
         realtimeDb,
         `devices/${deviceId}/configuration/control/${deviceKey}`
       );
 
-      if (isDelayControl(deviceKey)) {
-        const device = sensorData.configuration.control[deviceKey];
-        await set(controlRef, {
-          ...device,
-          delay,
-        });
-      }
+      await set(controlRef, {
+        ...device,
+        timeRanges: [...currentRanges, range],
+      });
     } catch (error) {
-      console.error("Chyba při aktualizaci zpoždění:", error);
+      console.error("Chyba při přidání časového intervalu:", error);
+    }
+  };
+
+  const handleTimeRangeDelete = async (deviceKey: DeviceControlKey, index: number) => {
+    try {
+      if (!isTimeControl(deviceKey)) return;
+      
+      const device = sensorData.configuration.control[deviceKey] || getDefaultDevice(deviceKey);
+      const currentRanges = [...(device.timeRanges || [])];
+      currentRanges.splice(index, 1);
+      
+      const controlRef = ref(
+        realtimeDb,
+        `devices/${deviceId}/configuration/control/${deviceKey}`
+      );
+
+      await set(controlRef, {
+        ...device,
+        timeRanges: currentRanges,
+      });
+    } catch (error) {
+      console.error("Chyba při smazání časového intervalu:", error);
+    }
+  };
+
+  const handleRunTimeChange = async (deviceKey: DeviceControlKey, seconds: number) => {
+    try {
+      if (!isDelayControl(deviceKey)) return;
+
+      const controlRef = ref(
+        realtimeDb,
+        `devices/${deviceId}/configuration/control/${deviceKey}`
+      );
+
+      const device = sensorData.configuration.control[deviceKey] || getDefaultDevice(deviceKey);
+      await set(controlRef, {
+        ...device,
+        delay: seconds.toString()
+      });
+    } catch (error) {
+      console.error("Chyba při aktualizaci doby běhu:", error);
+    }
+  };
+
+  const handleConfirm = async (deviceKey: DeviceControlKey) => {
+    try {
+      const device = sensorData.configuration.control[deviceKey] || getDefaultDevice(deviceKey);
+      const controlRef = ref(
+        realtimeDb,
+        `devices/${deviceId}/configuration/control/${deviceKey}`
+      );
+      await set(controlRef, device);
+    } catch (error) {
+      console.error("Chyba při potvrzení nastavení:", error);
     }
   };
 
@@ -98,19 +177,20 @@ export default function SettingsPage({
           <h3 className="text-lg font-semibold">LED osvětlení</h3>
           <div className="space-y-6">
             {timeControlDevices.slice(0, 3).map((key, index) => {
-              const device = sensorData.configuration.control[key];
+              const device = sensorData.configuration.control[key] || getDefaultDevice(key);
               return (
                 <ToggleRow
                   key={key}
                   title={`LED ${index + 1}`}
-                  subtitle="Časování"
+                  mode="timeRange"
                   isChecked={device.state}
-                  onToggle={(checked, timeMode, timeFrom, timeTo) =>
-                    handleDeviceUpdate(key, checked, timeMode, timeFrom, timeTo)
+                  timeRanges={device.timeRanges || []}
+                  onToggle={(checked, ranges) =>
+                    handleDeviceUpdate(key, checked, ranges)
                   }
-                  initialTimeMode={device.isAllDay ? "always" : "time"}
-                  initialTimeFrom={device.startTime}
-                  initialTimeTo={device.endTime}
+                  onTimeRangeAdd={(range) => handleTimeRangeAdd(key, range)}
+                  onTimeRangeDelete={(index) => handleTimeRangeDelete(key, index)}
+                  onConfirm={() => handleConfirm(key)}
                 />
               );
             })}
@@ -118,40 +198,44 @@ export default function SettingsPage({
         </div>
 
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold">Čerpadla</h3>
+          <h3 className="text-lg font-semibold">Hlavní pumpa</h3>
           <div className="space-y-6">
-            {/* Hlavní čerpadlo */}
-            {timeControlDevices.slice(3).map((key) => {
-              const device = sensorData.configuration.control[key];
+            {timeControlDevices.slice(3, 4).map((key) => {
+              const device = sensorData.configuration.control[key] || getDefaultDevice(key);
               return (
                 <ToggleRow
                   key={key}
-                  title="Hlavní čerpadlo"
-                  subtitle="Časování"
+                  title="Hlavní pumpa"
+                  mode="timeRange"
                   isChecked={device.state}
-                  onToggle={(checked, timeMode, timeFrom, timeTo) =>
-                    handleDeviceUpdate(key, checked, timeMode, timeFrom, timeTo)
+                  timeRanges={device.timeRanges || []}
+                  onToggle={(checked, ranges) =>
+                    handleDeviceUpdate(key, checked, ranges)
                   }
-                  initialTimeMode={device.isAllDay ? "always" : "time"}
-                  initialTimeFrom={device.startTime}
-                  initialTimeTo={device.endTime}
+                  onTimeRangeAdd={(range) => handleTimeRangeAdd(key, range)}
+                  onTimeRangeDelete={(index) => handleTimeRangeDelete(key, index)}
+                  onConfirm={() => handleConfirm(key)}
                 />
               );
             })}
+          </div>
+        </div>
 
-            {/* Peristaltická čerpadla */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold">Peristaltická pumpa</h3>
+          <div className="space-y-6">
             {delayControlDevices.map((key, index) => {
-              const device = sensorData.configuration.control[key];
+              const device = sensorData.configuration.control[key] || getDefaultDevice(key);
               return (
                 <ToggleRow
                   key={key}
-                  title={`Peristaltické čerpadlo ${index + 1}`}
-                  subtitle={`Zpoždění: ${device.delay}ms`}
+                  title={`Peristaltická pumpa ${index + 1}`}
+                  mode="peristaltic"
                   isChecked={device.state}
+                  runTime={parseInt(device.delay)}
+                  onRunTimeChange={(seconds) => handleRunTimeChange(key, seconds)}
                   onToggle={(checked) => handleDeviceUpdate(key, checked)}
-                  showDelay
-                  initialDelay={device.delay}
-                  onDelayChange={(delay) => handleDelayUpdate(key, delay)}
+                  onConfirm={() => handleConfirm(key)}
                 />
               );
             })}

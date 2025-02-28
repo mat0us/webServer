@@ -5,16 +5,21 @@ export interface DeviceAccess {
   userId: string;
 }
 
-interface TimeControl {
-  endTime: string;
+interface TimeRange {
   startTime: string;
+  endTime: string;
+}
+
+interface TimeControl {
   state: boolean;
-  isAllDay?: boolean;
+  name?: string;
+  timeRanges?: TimeRange[];
 }
 
 interface DelayControl {
   delay: string;
   state: boolean;
+  name?: string;
 }
 
 interface DeviceControl {
@@ -52,12 +57,11 @@ export interface Device {
 }
 
 export type DeviceControlKey = keyof DeviceControl;
+export type TimeControlKey = "led1" | "led2" | "led3" | "pump";
+export type DelayControlKey = "peristatic1" | "peristatic2" | "peristatic3";
 
 export const timeControlDevices = ["led1", "led2", "led3", "pump"] as const;
 export const delayControlDevices = ["peristatic1", "peristatic2", "peristatic3"] as const;
-
-export type TimeControlKey = typeof timeControlDevices[number];
-export type DelayControlKey = typeof delayControlDevices[number];
 
 export function isTimeControl(key: DeviceControlKey): key is TimeControlKey {
   return timeControlDevices.includes(key as TimeControlKey);
@@ -65,4 +69,4 @@ export function isTimeControl(key: DeviceControlKey): key is TimeControlKey {
 
 export function isDelayControl(key: DeviceControlKey): key is DelayControlKey {
   return delayControlDevices.includes(key as DelayControlKey);
-} 
+}
