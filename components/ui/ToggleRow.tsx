@@ -19,6 +19,7 @@ interface ToggleRowProps {
   onRunTimeChange?: (seconds: number) => void;
   onTimeRangeAdd?: (range: TimeRange[]) => void;
   onTimeRangeDelete?: (index: number) => void;
+  onTimeRangeDeleteAll?: () => void;
   onConfirm?: () => void;
 }
 
@@ -33,6 +34,7 @@ const ToggleRow: React.FC<ToggleRowProps> = ({
   onRunTimeChange,
   onTimeRangeAdd,
   onTimeRangeDelete,
+  onTimeRangeDeleteAll,
   onConfirm,
 }) => {
   const [currentRange, setCurrentRange] = useState<number>(0);
@@ -123,6 +125,14 @@ const ToggleRow: React.FC<ToggleRowProps> = ({
   const handleTimeRangeDelete = (index: number) => {
     if (onTimeRangeDelete) {
       onTimeRangeDelete(index);
+      setHasChanges(true);
+      setPendingTimeRange(null);
+    }
+  };
+
+  const handleTimeRangeDeleteAll = () => {
+    if (onTimeRangeDeleteAll) {
+      onTimeRangeDeleteAll();
       setHasChanges(true);
       setPendingTimeRange(null);
     }
@@ -484,6 +494,14 @@ const ToggleRow: React.FC<ToggleRowProps> = ({
                       >
                         Smazat interval
                       </button>
+
+                      <button
+                        onClick={handleTimeRangeDeleteAll}
+                        className="text-red-500 text-sm hover:text-red-600"
+                      >
+                        Smazat všechny intervaly
+                      </button>
+                      
                       <button
                         onClick={handleTimeRangeAdd}
                         className="text-green-500 text-sm hover:text-green-600"

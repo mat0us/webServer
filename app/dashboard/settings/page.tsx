@@ -142,6 +142,25 @@ export default function SettingsPage({
     }
   };
 
+  const handleTimeRangeDeleteAll = async (deviceKey: DeviceControlKey) => {
+    try {
+      if (!isTimeControl(deviceKey)) return;
+      
+      const device = sensorData.configuration.control[deviceKey] || getDefaultDevice(deviceKey);
+      const controlRef = ref(
+        realtimeDb,
+        `devices/${deviceId}/configuration/control/${deviceKey}`
+      );
+
+      await set(controlRef, {
+        ...device,
+        timeRanges: [],
+      });
+    } catch (error) {
+      console.error("Chyba při smazání všech časových intervalů:", error);
+    }
+  };
+
   const handleRunTimeChange = async (deviceKey: DeviceControlKey, seconds: number) => {
     try {
       if (!isDelayControl(deviceKey)) return;
@@ -197,6 +216,7 @@ export default function SettingsPage({
                   }
                   onTimeRangeAdd={(range) => handleTimeRangeAdd(key, range)}
                   onTimeRangeDelete={(index) => handleTimeRangeDelete(key, index)}
+                  onTimeRangeDeleteAll={() => handleTimeRangeDeleteAll(key)}
                   onConfirm={() => handleConfirm(key)}
                 />
               );
@@ -221,6 +241,7 @@ export default function SettingsPage({
                   }
                   onTimeRangeAdd={(range) => handleTimeRangeAdd(key, range)}
                   onTimeRangeDelete={(index) => handleTimeRangeDelete(key, index)}
+                  onTimeRangeDeleteAll={() => handleTimeRangeDeleteAll(key)}
                   onConfirm={() => handleConfirm(key)}
                 />
               );
