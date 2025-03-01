@@ -90,35 +90,37 @@ export default function Dashboard() {
     <div className="min-h-screen bg-brand-gradient">
       {/* Header */}
       <header className="sticky top-0 z-10 w-full bg-white shadow-md">
-        <div className="max-w-6xl mx-auto flex flex-wrap justify-between items-center py-4 px-4 sm:px-0">
-          <div className="flex items-center justify-center w-full sm:w-auto">
-            <Logo className="w-8 h-8 sm:w-10 sm:h-10 mx-4" />
-            <h1 className="text-2xl sm:text-3xl font-bold text-green-500">HydroLeaf</h1>
+        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row justify-between items-center py-3 px-4 sm:px-6 md:px-8">
+          <div className="flex items-center justify-center mb-3 sm:mb-0">
+            <Logo className="w-8 h-8 sm:w-10 sm:h-10 mr-3" />
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-green-500">HydroLeaf</h1>
           </div>
-          <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto justify-center sm:justify-end mt-4 sm:mt-0">
+          <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto justify-center sm:justify-end">
             <TowerPicker
               towers={userTowers}
               selectedTower={selectedTower}
               onTowerChange={handleTowerChange}
             />
-            <Button onClick={handleSignOut} className="w-full sm:w-auto mx-4">Sign Out</Button>
+            <Button onClick={handleSignOut} className="w-full sm:w-auto mt-3 sm:mt-0">Sign Out</Button>
           </div>
         </div>
       </header>
 
       {/* Content */}
-      <div className="max-w-6xl mx-auto p-4 sm:p-8">
+      <div className="max-w-6xl mx-auto p-3 sm:p-6 md:p-8">
         <Tabs defaultValue="graph" className="space-y-4">
-          <TabsList>
-            <TabsTrigger value="graph">Graph</TabsTrigger>
-            <TabsTrigger value="settings">Settings</TabsTrigger>
-          </TabsList>
+          <div className="overflow-x-auto">
+            <TabsList className="mb-4">
+              <TabsTrigger value="graph" className="px-4 py-2">Graph</TabsTrigger>
+              <TabsTrigger value="settings" className="px-4 py-2">Settings</TabsTrigger>
+            </TabsList>
+          </div>
 
-          <TabsContent value="graph">
+          <TabsContent value="graph" className="mt-4">
             {selectedTower && <GraphPage deviceId={selectedTower} />}
           </TabsContent>
 
-          <TabsContent value="settings">
+          <TabsContent value="settings" className="mt-4">
             {sensorData && (
               <SettingsPage sensorData={sensorData} deviceId={selectedTower} />
             )}

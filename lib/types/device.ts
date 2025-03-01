@@ -31,7 +31,6 @@ interface DeviceControl {
   pump: TimeControl;
   peristatic1: DelayControl;
   peristatic2: DelayControl;
-  peristatic3: DelayControl;
 }
 
 interface DeviceConfiguration {
@@ -60,10 +59,10 @@ export interface Device {
 
 export type DeviceControlKey = keyof DeviceControl;
 export type TimeControlKey = "led1" | "led2" | "led3" | "pump";
-export type DelayControlKey = "peristatic1" | "peristatic2" | "peristatic3";
+export type DelayControlKey = "peristatic1" | "peristatic2";
 
 export const timeControlDevices = ["led1", "led2", "led3", "pump"] as const;
-export const delayControlDevices = ["peristatic1", "peristatic2", "peristatic3"] as const;
+export const delayControlDevices = ["peristatic1", "peristatic2"] as const;
 
 export function isTimeControl(key: DeviceControlKey): key is TimeControlKey {
   return timeControlDevices.includes(key as TimeControlKey);
