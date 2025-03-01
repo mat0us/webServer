@@ -37,6 +37,7 @@ export default function RootLayout({
         <link rel="icon" type="image/svg+xml" href="/icons/logo.svg" />
         <link rel="apple-touch-icon" href="/icons/logo.svg" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
       </head>
       <body className={inter.className} suppressHydrationWarning>
