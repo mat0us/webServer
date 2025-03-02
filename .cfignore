@@ -1,0 +1,11 @@
+# Vyloučíme cache adresáře z nasazení na Cloudflare Pages
+.next/cache/
+.next/cache/webpack/
+.next/cache/webpack/client-production/
+.next/cache/webpack/client-production/0.pack
+.next/cache/webpack/server-production/
+node_modules/
+.git/
+**/*.map
+**/*.ts
+**/*.tsx

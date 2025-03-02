@@ -22,6 +22,8 @@ const nextConfig = {
   images: {
     unoptimized: true, // Nastavíme na true pro statický export
   },
+  // Explicitně nastavíme output na 'export' pro statický export
+  output: 'export',
   // Přidáme webpack konfiguraci pro lepší optimalizaci
   webpack: (config, { dev, isServer }) => {
     // Optimalizace pro produkční build
@@ -76,6 +78,13 @@ const nextConfig = {
     }
 
     return config;
+  },
+  // Vyloučíme cache adresáře z buildu
+  distDir: '.next',
+  cleanDistDir: true,
+  experimental: {
+    // Vypneme generování sourcemaps pro server
+    serverSourceMaps: false,
   },
 };
 

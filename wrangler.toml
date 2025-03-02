@@ -1,0 +1,21 @@
+[site]
+bucket = "./out"
+entry-point = "./.cloudflare/workers-site"
+
+[build]
+command = "npm run build"
+upload.format = "service-worker"
+
+[build.upload]
+format = "service-worker"
+
+# Vyloučíme adresář cache
+[build.exclude]
+paths = [
+  ".next/cache/**/*",
+  ".next/cache/webpack/**/*",
+  ".next/cache/webpack/client-production/**/*",
+  ".next/cache/webpack/client-production/0.pack",
+  ".next/cache/webpack/server-production/**/*",
+  "node_modules/**/*"
+]
