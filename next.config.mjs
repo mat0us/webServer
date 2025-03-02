@@ -20,10 +20,8 @@ const nextConfig = {
   },
   // Optimalizujeme obrázky
   images: {
-    unoptimized: false,
+    unoptimized: true, // Nastavíme na true pro statický export
   },
-  // Nastavíme output na 'export' místo 'standalone' pro lepší kompatibilitu s Cloudflare Pages
-  output: 'export',
   // Přidáme webpack konfiguraci pro lepší optimalizaci
   webpack: (config, { dev, isServer }) => {
     // Optimalizace pro produkční build
@@ -33,33 +31,48 @@ const nextConfig = {
         chunks: 'all',
         maxInitialRequests: 25,
         minSize: 20000,
-        maxSize: 20000000, // Nastavení maximální velikosti chunků
+        maxSize: 1000000, // Snížíme maximální velikost chunků na 1MB
         cacheGroups: {
           default: false,
           vendors: false,
           framework: {
             name: 'framework',
-            test: /[\\/]node_modules[\\/](react|react-dom|next)[\\/]/,
+            test: /[\\/]node_modules[\\/](react|react-dom|scheduler|prop-types|use-subscription)[\\/]/,
             priority: 40,
             // Tyto balíčky jsou společné a měly by být v jednom chunku
             enforce: true,
           },
+          commons: {
+            name: 'commons',
+            test: /[\\/]node_modules[\\/](next|firebase|recharts)[\\/]/,
+            priority: 30,
+            enforce: true,
+          },
           lib: {
             test: /[\\/]node_modules[\\/]/,
-            priority: 30,
+            priority: 20,
             minChunks: 2,
-            name(module) {
-              // Získáme jméno balíčku z node_modules
-              const match = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/);
-              if (!match) return 'npm.unknown';
-              
-              // Vrátíme jméno npm balíčku
-              const packageName = match[1];
-              return `npm.${packageName.replace('@', '')}`;
-            },
+            reuseExistingChunk: true,
           },
         },
       };
+
+      // Minimalizace pro produkci
+      if (config.optimization.minimizer) {
+        config.optimization.minimizer.forEach((minimizer) => {
+          if (minimizer.constructor.name === 'TerserPlugin') {
+            minimizer.options.terserOptions = {
+              ...minimizer.options.terserOptions,
+              compress: {
+                ...minimizer.options.terserOptions.compress,
+                drop_console: true,
+              },
+              keep_classnames: true,
+              keep_fnames: true,
+            };
+          }
+        });
+      }
     }
 
     return config;
