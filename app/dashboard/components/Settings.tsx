@@ -21,15 +21,12 @@ interface TimeRange {
   periodicity?: number; // in minutes
 }
 
-interface SettingsComponentProps {
+interface SettingsProps {
   sensorData: Device;
   deviceId: string;
 }
 
-function SettingsComponent({
-  sensorData,
-  deviceId,
-}: SettingsComponentProps) {
+export default function Settings({ sensorData, deviceId }: SettingsProps) {
   const getDefaultDevice = (key: DeviceControlKey) => {
     if (isTimeControl(key)) {
       return {
@@ -272,9 +269,4 @@ function SettingsComponent({
       </CardContent>
     </Card>
   );
-}
-
-// Toto je hlavní exportovaná stránka, která bude kompatibilní s Next.js
-export default function Page() {
-  return null;
 }

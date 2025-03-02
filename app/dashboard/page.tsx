@@ -8,10 +8,12 @@ import { ref, onValue } from "firebase/database";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/ui/Logo";
 import { TowerPicker } from "@/components/ui/TowerPicker";
-import GraphPage from "./graph/page";
-import SettingsPage from "./settings/page";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Device, DeviceAccess } from "@/lib/types/device";
+
+// Importujeme komponenty místo stránek
+import GraphComponent from "./components/Graph";
+import SettingsComponent from "./components/Settings";
 
 export default function Dashboard() {
   const [user, setUser] = useState<any>(null);
@@ -117,12 +119,12 @@ export default function Dashboard() {
           </div>
 
           <TabsContent value="graph" className="mt-4">
-            {selectedTower && <GraphPage deviceId={selectedTower} />}
+            {selectedTower && <GraphComponent deviceId={selectedTower} />}
           </TabsContent>
 
           <TabsContent value="settings" className="mt-4">
             {sensorData && (
-              <SettingsPage sensorData={sensorData} deviceId={selectedTower} />
+              <SettingsComponent sensorData={sensorData} deviceId={selectedTower} />
             )}
           </TabsContent>
         </Tabs>

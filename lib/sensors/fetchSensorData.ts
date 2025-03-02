@@ -1,4 +1,4 @@
-import { db, auth } from "../firebase";
+import { realtimeDb as db, auth } from "../firebase";
 import { ref, onValue, get } from "firebase/database";
 import { SensorData } from "../model/SensorData"; // Adjust the import path as necessary
 import { onAuthStateChanged } from "firebase/auth";

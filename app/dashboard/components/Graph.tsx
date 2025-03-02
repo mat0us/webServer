@@ -51,11 +51,11 @@ const timeRangeLabels: Record<TimeRange, string> = {
   all: "Vše",
 };
 
-interface GraphComponentProps {
+interface GraphProps {
   deviceId: string;
 }
 
-function GraphComponent({ deviceId }: GraphComponentProps) {
+export default function Graph({ deviceId }: GraphProps) {
   const [chartData, setChartData] = useState<DataPoint[]>([]);
   const [currentData, setCurrentData] = useState<SensorData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -375,9 +375,4 @@ function GraphComponent({ deviceId }: GraphComponentProps) {
       )}
     </div>
   );
-}
-
-// Toto je hlavní exportovaná stránka, která bude kompatibilní s Next.js
-export default function Page() {
-  return null;
 }
