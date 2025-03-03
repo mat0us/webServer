@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import Switch from "./switchProps";
 
 interface TimeRange {
-  startTime: string;
-  endTime: string;
+  start: string;
+  end: string;
   isPeriodic?: boolean;
   periodicity?: number; // in minutes
 }
@@ -67,7 +67,7 @@ const ToggleRow: React.FC<ToggleRowProps> = ({
     // If this is a periodic range, we'll validate it differently
     if (newRange?.isPeriodic) {
       // For periodic ranges, just check that start time is before end time
-      if (timeToMinutes(newRange.startTime) >= timeToMinutes(newRange.endTime)) {
+      if (timeToMinutes(newRange.start) >= timeToMinutes(newRange.end)) {
         setError("Počáteční čas musí být před koncovým časem");
         return false;
       }
@@ -86,13 +86,13 @@ const ToggleRow: React.FC<ToggleRowProps> = ({
 
     // Sort ranges by start time
     const sortedRanges = [...allRanges].sort((a, b) => 
-      timeToMinutes(a.startTime) - timeToMinutes(b.startTime)
+      timeToMinutes(a.start) - timeToMinutes(b.start)
     );
 
     // Check for overlaps
     for (let i = 0; i < sortedRanges.length - 1; i++) {
-      const currentEnd = timeToMinutes(sortedRanges[i].endTime);
-      const nextStart = timeToMinutes(sortedRanges[i + 1].startTime);
+      const currentEnd = timeToMinutes(sortedRanges[i].end);
+      const nextStart = timeToMinutes(sortedRanges[i + 1].start);
       
       if (currentEnd >= nextStart) {
         setError("Intervaly se nesmí překrývat");
@@ -102,7 +102,7 @@ const ToggleRow: React.FC<ToggleRowProps> = ({
 
     // Check that start time is before end time for each range
     for (const range of sortedRanges) {
-      if (timeToMinutes(range.startTime) >= timeToMinutes(range.endTime)) {
+      if (timeToMinutes(range.start) >= timeToMinutes(range.end)) {
         setError("Počáteční čas musí být před koncovým časem");
         return false;
       }
@@ -114,8 +114,8 @@ const ToggleRow: React.FC<ToggleRowProps> = ({
 
   const handleTimeRangeAdd = () => {
     setPendingTimeRange({ 
-      startTime: "00:00", 
-      endTime: "00:00", 
+      start: "00:00", 
+      end: "00:00", 
       isPeriodic: false, 
       periodicity: 60 // Default to 1 hour
     });
@@ -147,7 +147,7 @@ const ToggleRow: React.FC<ToggleRowProps> = ({
     if (pendingTimeRange) {
       const newRange = {
         ...pendingTimeRange,
-        [type === 'start' ? 'startTime' : 'endTime']: value,
+        [type === 'start' ? 'start' : 'end']: value,
       };
       setPendingTimeRange(newRange);
       validateTimeRanges(timeRanges, newRange);
@@ -155,7 +155,7 @@ const ToggleRow: React.FC<ToggleRowProps> = ({
       const newRanges = [...timeRanges];
       newRanges[currentRange] = {
         ...newRanges[currentRange],
-        [type === 'start' ? 'startTime' : 'endTime']: value,
+        [type === 'start' ? 'start' : 'end']: value,
       };
       if (validateTimeRanges(newRanges)) {
         onToggle(isChecked, newRanges);
@@ -204,8 +204,8 @@ const ToggleRow: React.FC<ToggleRowProps> = ({
     if (pendingTimeRange && onTimeRangeAdd && validateTimeRanges(timeRanges, pendingTimeRange)) {
       if (pendingTimeRange.isPeriodic && pendingTimeRange.periodicity) {
         // Create periodic intervals
-        const startMinutes = timeToMinutes(pendingTimeRange.startTime);
-        const endMinutes = timeToMinutes(pendingTimeRange.endTime);
+        const startMinutes = timeToMinutes(pendingTimeRange.start);
+        const endMinutes = timeToMinutes(pendingTimeRange.end);
         
         // Create intervals based on periodicity
         const intervals = [];
@@ -220,8 +220,8 @@ const ToggleRow: React.FC<ToggleRowProps> = ({
           // Only add the interval if it fits completely within the range
           if (currentEnd <= endMinutes) {
             intervals.push({
-              startTime: minutesToTime(currentStart),
-              endTime: minutesToTime(currentEnd),
+              start: minutesToTime(currentStart),
+              end: minutesToTime(currentEnd),
               isPeriodic: false // Individual intervals are not periodic
             });
           }
@@ -411,7 +411,7 @@ const ToggleRow: React.FC<ToggleRowProps> = ({
                       <label className="block text-sm font-medium text-gray-700 mb-1">Od:</label>
                       <input
                         type="time"
-                        value={pendingTimeRange?.startTime || timeRanges[currentRange]?.startTime || ""}
+                        value={pendingTimeRange?.start || timeRanges[currentRange]?.start || ""}
                         className="w-full p-2 border border-green-300 rounded-md bg-white/80 focus:ring-2 focus:ring-green-500 focus:border-green-500 focus:outline-none transition-all"
                         onChange={(e) => handleTimeChange('start', e.target.value)}
                       />
@@ -420,7 +420,7 @@ const ToggleRow: React.FC<ToggleRowProps> = ({
                       <label className="block text-sm font-medium text-gray-700 mb-1">Do:</label>
                       <input
                         type="time"
-                        value={pendingTimeRange?.endTime || timeRanges[currentRange]?.endTime || ""}
+                        value={pendingTimeRange?.end || timeRanges[currentRange]?.end || ""}
                         className="w-full p-2 border border-green-300 rounded-md bg-white/80 focus:ring-2 focus:ring-green-500 focus:border-green-500 focus:outline-none transition-all"
                         onChange={(e) => handleTimeChange('end', e.target.value)}
                       />
@@ -471,12 +471,12 @@ const ToggleRow: React.FC<ToggleRowProps> = ({
                         </div>
                         
                         {(() => {
-                          const startTime = pendingTimeRange?.startTime || timeRanges[currentRange]?.startTime || "00:00";
-                          const endTime = pendingTimeRange?.endTime || timeRanges[currentRange]?.endTime || "00:00";
+                          const start = pendingTimeRange?.start || timeRanges[currentRange]?.start || "00:00";
+                          const end = pendingTimeRange?.end || timeRanges[currentRange]?.end || "00:00";
                           const periodicity = pendingTimeRange?.periodicity || timeRanges[currentRange]?.periodicity || 60;
                           
-                          const startMinutes = timeToMinutes(startTime);
-                          const endMinutes = timeToMinutes(endTime);
+                          const startMinutes = timeToMinutes(start);
+                          const endMinutes = timeToMinutes(end);
                           const totalMinutes = endMinutes - startMinutes;
                           
                           if (totalMinutes <= 0) return null;
@@ -491,7 +491,7 @@ const ToggleRow: React.FC<ToggleRowProps> = ({
                           return (
                             <div className="mt-3 bg-green-50/70 p-3 rounded-md">
                               <p className="text-xs text-gray-600 font-medium">
-                                Vytvoří se přibližně {totalIntervals} intervalů od {startTime} do {endTime} s délkou {periodicity} minut, mezi kterými budou pauzy stejné délky.
+                                Vytvoří se přibližně {totalIntervals} intervalů od {start} do {end} s délkou {periodicity} minut, mezi kterými budou pauzy stejné délky.
                               </p>
                               <div className="mt-2">
                                 <p className="text-xs font-semibold text-gray-700">Náhled intervalů:</p>

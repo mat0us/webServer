@@ -6,8 +6,8 @@ export interface DeviceAccess {
 }
 
 interface TimeRange {
-  startTime: string;
-  endTime: string;
+  start: string;
+  end: string;
   isPeriodic?: boolean;
   periodicity?: number; // in minutes
 }

@@ -15,8 +15,8 @@ import { realtimeDb } from "@/lib/firebase";
 import { useEffect } from "react";
 
 interface TimeRange {
-  startTime: string;
-  endTime: string;
+  start: string;
+  end: string;
   isPeriodic?: boolean;
   periodicity?: number; // in minutes
 }
