@@ -44,6 +44,15 @@ const ToggleRow: React.FC<ToggleRowProps> = ({
   const [hasChanges, setHasChanges] = useState(false);
   const [pendingTimeRange, setPendingTimeRange] = useState<TimeRange | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // Local state for UI expansion and local checked state
+  const [isExpanded, setIsExpanded] = useState(isChecked);
+  const [localIsChecked, setLocalIsChecked] = useState(isChecked);
+
+  useEffect(() => {
+    // Update local states when isChecked prop changes
+    setIsExpanded(isChecked);
+    setLocalIsChecked(isChecked);
+  }, [isChecked]);
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
@@ -280,81 +289,80 @@ const ToggleRow: React.FC<ToggleRowProps> = ({
             </div>
           </div>
           
-          
-            <div className="mt-4">
-              <div className="bg-white/80 p-4 rounded-md border border-green-200">
-                {editingTime ? (
-                  <div className="flex items-center gap-3">
-                    <label className="text-sm font-medium text-gray-700">Doba běhu:</label>
-                    <div className="flex items-center gap-2 w-full">
-                      <input
-                        type="number"
-                        min="1"
-                        value={tempRunTime}
-                        onChange={(e) => setTempRunTime(e.target.value)}
-                        className="w-20 p-2 border border-green-300 rounded-md bg-white/80 focus:ring-2 focus:ring-green-500 focus:border-green-500 focus:outline-none transition-all"
-                      />
-                      <span className="text-sm text-gray-500">s</span>
-                    </div>
-                   <button
-                      onClick={handleRunTimeChange}
-                      className="p-1.5 text-green-600 bg-green-50 rounded-md hover:bg-green-100 transition-colors ml-auto flex items-center justify-center w-8 h-8"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                    </button>
+          <div className="mt-4">
+            <div className="bg-white/80 p-4 rounded-md border border-green-200">
+              {editingTime ? (
+                <div className="flex items-center gap-3">
+                  <label className="text-sm font-medium text-gray-700">Doba běhu:</label>
+                  <div className="flex items-center gap-2 w-full">
+                    <input
+                      type="number"
+                      min="1"
+                      value={tempRunTime}
+                      onChange={(e) => setTempRunTime(e.target.value)}
+                      className="w-20 p-2 border border-green-300 rounded-md bg-white/80 focus:ring-2 focus:ring-green-500 focus:border-green-500 focus:outline-none transition-all"
+                    />
+                    <span className="text-sm text-gray-500">s</span>
                   </div>
-                ) : (
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-gray-700">Doba běhu:</span>
-                      <span className="text-sm text-gray-600 font-bold">{runTime}s</span>
-                    </div>
-                    <button
-                      onClick={() => {
-                        setTempRunTime(runTime.toString());
-                        setEditingTime(true);
-                      }}
-                      className="p-1.5 text-orange-600 hover:bg-orange-50 rounded-md transition-colors flex items-center justify-center w-8 h-8"
-                      >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="orange">
-                        <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                      </svg> 
-                    </button>
+                  <button
+                    onClick={handleRunTimeChange}
+                    className="p-1.5 text-green-600 bg-green-50 rounded-md hover:bg-green-100 transition-colors ml-auto flex items-center justify-center w-8 h-8"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium text-gray-700">Doba běhu:</span>
+                    <span className="text-sm text-gray-600 font-bold">{runTime}s</span>
                   </div>
-                )}
-              </div>
-              
-              <div className="mt-4">
-                <button
-                  onClick={handlePeristalticStart}
-                  disabled={isRunning}
-                  className={`w-full py-3 px-4 rounded-md ${
-                    isRunning
-                      ? "bg-gray-400 cursor-not-allowed"
-                      : "bg-green-600 hover:bg-green-700"
-                  } text-white transition-colors font-medium flex items-center justify-center`}
-                >
-                  {isRunning ? (
-                    <>
-                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      Probíhá...
-                    </>
-                  ) : (
-                    <>
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
-                      </svg>
-                      Spustit
-                    </>
-                  )}
-                </button>
-              </div>
+                  <button
+                    onClick={() => {
+                      setTempRunTime(runTime.toString());
+                      setEditingTime(true);
+                    }}
+                    className="p-1.5 text-orange-600 hover:bg-orange-50 rounded-md transition-colors flex items-center justify-center w-8 h-8"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="orange">
+                      <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                    </svg> 
+                  </button>
+                </div>
+              )}
             </div>
+            
+            <div className="mt-4">
+              <button
+                onClick={handlePeristalticStart}
+                disabled={isRunning}
+                className={`w-full py-3 px-4 rounded-md ${
+                  isRunning
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-green-600 hover:bg-green-700"
+                } text-white transition-colors font-medium flex items-center justify-center`}
+              >
+                {isRunning ? (
+                  <>
+                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Probíhá...
+                  </>
+                ) : (
+                  <>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
+                    </svg>
+                    Spustit
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -368,10 +376,29 @@ const ToggleRow: React.FC<ToggleRowProps> = ({
             <h3 className="font-semibold text-gray-800">{title}</h3>
             {subtitle && <span className="text-sm text-gray-500">{subtitle}</span>}
           </div>
-          <Switch checked={isChecked} onChange={() => onToggle(!isChecked)} />
+          <Switch 
+            checked={localIsChecked} 
+            onChange={() => {
+              if (localIsChecked) {
+                // When turning OFF, always update the database state to false
+                onToggle(false, timeRanges);
+                setLocalIsChecked(false);
+                setIsExpanded(false);
+              } else {
+                // When turning ON
+                if (timeRanges.length > 0) {
+                  // If we have intervals, update the database
+                  onToggle(true, timeRanges);
+                }
+                // Either way, update local UI states
+                setLocalIsChecked(true);
+                setIsExpanded(true);
+              }
+            }} 
+          />
         </div>
         
-        {isChecked && (
+        {isExpanded && (
           <div className="mt-4">
             {(timeRanges.length > 0 || pendingTimeRange) ? (
               <>
@@ -545,7 +572,7 @@ const ToggleRow: React.FC<ToggleRowProps> = ({
                           className="px-3 py-1.5 rounded-md bg-green-600 text-white text-sm font-medium hover:bg-green-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed w-full sm:w-auto"
                           disabled={!!error}
                         >
-                          Potvrdit interval
+                          Vytvořit interval
                         </button>
                       </>
                     ) : (
@@ -570,13 +597,32 @@ const ToggleRow: React.FC<ToggleRowProps> = ({
                           onClick={handleTimeRangeAdd}
                           className="px-3 py-1.5 rounded-md bg-green-600 text-white text-sm font-medium hover:bg-green-700 transition-colors flex items-center justify-center w-full sm:w-auto"
                         >
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clipRule="evenodd" />
-                          </svg>
+                          {/* <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
+                          </svg> */}
                           Přidat interval
                         </button>
                       </>
                     )}
+                    <button
+                      onClick={() => {
+                        if (onConfirm) {
+                          // Update database when confirming settings
+                          onConfirm();
+            
+                          // Set database state to true when submitting time ranges
+                          if (timeRanges.length > 0) {
+                            onToggle(true, timeRanges);
+                          }
+                        }
+                      }}
+                      className="px-3 py-1.5 rounded-md bg-green-600 text-white text-sm font-medium hover:bg-green-700 transition-colors flex items-center justify-center w-full sm:w-auto"
+                    >
+                      {/* <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg> */}
+                      Potvrdit
+                    </button>
                   </div>
                 </div>
               </>
@@ -587,12 +633,13 @@ const ToggleRow: React.FC<ToggleRowProps> = ({
                   className="w-full py-3 px-4 rounded-md bg-green-600 hover:bg-green-700 text-white transition-colors font-medium flex items-center justify-center"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clipRule="evenodd" />
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
                   </svg>
                   Přidat interval
                 </button>
               </div>
-            )}
+            )
+          }
           </div>
         )}
       </div>
