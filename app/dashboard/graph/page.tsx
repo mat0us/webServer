@@ -246,16 +246,16 @@ function GraphComponent({ deviceId }: GraphComponentProps) {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <Card className="bg-white/10 backdrop-blur-lg">
               <CardContent className="p-4">
-                <div className="text-sm text-muted-foreground">pH</div>
+                <div className="text-sm text-muted-foreground">VLHKOST</div>
                 <div className="text-2xl font-bold">
-                  {currentData.ph.toFixed(2)}
+                  {currentData.humidity.toFixed(2)}
                 </div>
               </CardContent>
             </Card>
 
             <Card className="bg-white/10 backdrop-blur-lg">
               <CardContent className="p-4">
-                <div className="text-sm text-muted-foreground">TDS</div>
+                <div className="text-sm text-muted-foreground">EC</div>
                 <div className="text-2xl font-bold">
                   {currentData.tds.toFixed(0)} ppm
                 </div>
@@ -265,10 +265,10 @@ function GraphComponent({ deviceId }: GraphComponentProps) {
             <Card className="bg-white/10 backdrop-blur-lg">
               <CardContent className="p-4">
                 <div className="text-sm text-muted-foreground">
-                  Teplota vody
+                  Teplota okolí
                 </div>
                 <div className="text-2xl font-bold">
-                  {currentData.waterTemperature.toFixed(1)} °C
+                  {currentData.temperature.toFixed(1)} °C
                 </div>
               </CardContent>
             </Card>
@@ -276,10 +276,10 @@ function GraphComponent({ deviceId }: GraphComponentProps) {
             <Card className="bg-white/10 backdrop-blur-lg">
               <CardContent className="p-4">
                 <div className="text-sm text-muted-foreground">
-                  Hladina vody
+                  OSVĚTLENÍ
                 </div>
                 <div className="text-2xl font-bold">
-                  {currentData.waterLevel.toFixed(0)} %
+                  {currentData.ambientLight.toFixed(0)} lux
                 </div>
               </CardContent>
             </Card>
@@ -329,9 +329,9 @@ function GraphComponent({ deviceId }: GraphComponentProps) {
                       <Tooltip />
                       <Line
                         type="monotone"
-                        dataKey="ph"
+                        dataKey="humidity"
                         stroke="#8884d8"
-                        name="pH"
+                        name="Vlhkost"
                         dot={false}
                         strokeWidth={2}
                       />
@@ -339,23 +339,23 @@ function GraphComponent({ deviceId }: GraphComponentProps) {
                         type="monotone"
                         dataKey="tds"
                         stroke="#82ca9d"
-                        name="TDS"
+                        name="EC"
                         dot={false}
                         strokeWidth={2}
                       />
                       <Line
                         type="monotone"
-                        dataKey="waterTemperature"
+                        dataKey="temperature"
                         stroke="#ff7300"
-                        name="Teplota vody"
+                        name="Teplota okolí"
                         dot={false}
                         strokeWidth={2}
                       />
                       <Line
                         type="monotone"
-                        dataKey="waterLevel"
+                        dataKey="ambientLight"
                         stroke="#0088FE"
-                        name="Hladina vody"
+                        name="Osvětlení"
                         dot={false}
                         strokeWidth={2}
                       />
