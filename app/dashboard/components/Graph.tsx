@@ -232,8 +232,8 @@ export default function Graph({ deviceId }: GraphProps) {
     <div className="space-y-4">
       {/* Karty s aktuálními hodnotami */}
       {loading ? (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {[...Array(4)].map((_, i) => (
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+          {[...Array(5)].map((_, i) => (
             <Card key={i} className="bg-white/10 backdrop-blur-lg">
               <CardContent className="p-4">
                 <div className="h-16 animate-pulse bg-gray-200/20 rounded" />
@@ -243,19 +243,19 @@ export default function Graph({ deviceId }: GraphProps) {
         </div>
       ) : (
         currentData && (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
             <Card className="bg-white/10 backdrop-blur-lg">
               <CardContent className="p-4">
-                <div className="text-sm text-muted-foreground">pH</div>
+                <div className="text-sm text-muted-foreground">VLHKOST</div>
                 <div className="text-2xl font-bold">
-                  {currentData.ph.toFixed(2)}
+                  {currentData.humidity.toFixed(2)}
                 </div>
               </CardContent>
             </Card>
 
             <Card className="bg-white/10 backdrop-blur-lg">
               <CardContent className="p-4">
-                <div className="text-sm text-muted-foreground">TDS</div>
+                <div className="text-sm text-muted-foreground">EC</div>
                 <div className="text-2xl font-bold">
                   {currentData.tds.toFixed(0)} ppm
                 </div>
@@ -265,7 +265,18 @@ export default function Graph({ deviceId }: GraphProps) {
             <Card className="bg-white/10 backdrop-blur-lg">
               <CardContent className="p-4">
                 <div className="text-sm text-muted-foreground">
-                  Teplota vody
+                  TEPLOTA OKOLÍ
+                </div>
+                <div className="text-2xl font-bold">
+                  {currentData.temperature.toFixed(1)} °C
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-white/10 backdrop-blur-lg">
+              <CardContent className="p-4">
+                <div className="text-sm text-muted-foreground">
+                  TEPLOTA ROZTOKU
                 </div>
                 <div className="text-2xl font-bold">
                   {currentData.waterTemperature.toFixed(1)} °C
@@ -276,10 +287,10 @@ export default function Graph({ deviceId }: GraphProps) {
             <Card className="bg-white/10 backdrop-blur-lg">
               <CardContent className="p-4">
                 <div className="text-sm text-muted-foreground">
-                  Hladina vody
+                  OSVĚTLENÍ
                 </div>
                 <div className="text-2xl font-bold">
-                  {currentData.waterLevel.toFixed(0)} %
+                  {currentData.ambientLight.toFixed(0)} lux
                 </div>
               </CardContent>
             </Card>
@@ -329,9 +340,9 @@ export default function Graph({ deviceId }: GraphProps) {
                       <Tooltip />
                       <Line
                         type="monotone"
-                        dataKey="ph"
+                        dataKey="humidity"
                         stroke="#8884d8"
-                        name="pH"
+                        name="Vlhkost"
                         dot={false}
                         strokeWidth={2}
                       />
@@ -339,23 +350,31 @@ export default function Graph({ deviceId }: GraphProps) {
                         type="monotone"
                         dataKey="tds"
                         stroke="#82ca9d"
-                        name="TDS"
+                        name="EC"
+                        dot={false}
+                        strokeWidth={2}
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="temperature"
+                        stroke="#ff7300"
+                        name="Teplota okolí"
                         dot={false}
                         strokeWidth={2}
                       />
                       <Line
                         type="monotone"
                         dataKey="waterTemperature"
-                        stroke="#ff7300"
+                        stroke="#00BFFF"
                         name="Teplota vody"
                         dot={false}
                         strokeWidth={2}
                       />
                       <Line
                         type="monotone"
-                        dataKey="waterLevel"
-                        stroke="#0088FE"
-                        name="Hladina vody"
+                        dataKey="ambientLight"
+                        stroke="#FFEA00"
+                        name="Osvětlení"
                         dot={false}
                         strokeWidth={2}
                       />
