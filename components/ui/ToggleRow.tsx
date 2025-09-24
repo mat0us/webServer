@@ -593,36 +593,30 @@ const ToggleRow: React.FC<ToggleRowProps> = ({
                           </button>
                         </div>
                         
-                        <button
-                          onClick={handleTimeRangeAdd}
-                          className="px-3 py-1.5 rounded-md bg-green-600 text-white text-sm font-medium hover:bg-green-700 transition-colors flex items-center justify-center w-full sm:w-auto"
-                        >
-                          {/* <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
-                          </svg> */}
-                          Přidat interval
-                        </button>
+                        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                          <button
+                            onClick={handleTimeRangeAdd}
+                            className="px-3 py-1.5 rounded-md bg-green-600 text-white text-sm font-medium hover:bg-green-700 transition-colors flex items-center justify-center w-full sm:w-auto"
+                          >
+                            Přidat interval
+                          </button>
+                          <button
+                            onClick={() => {
+                              if (onConfirm) {
+                                onConfirm();
+                                if (timeRanges.length > 0) {
+                                  onToggle(true, timeRanges);
+                                }
+                              }
+                            }}
+                            disabled={!onConfirm}
+                            className="px-3 py-1.5 rounded-md bg-green-600 text-white text-sm font-medium hover:bg-green-700 transition-colors flex items-center justify-center w-full sm:w-auto disabled:bg-gray-400 disabled:cursor-not-allowed"
+                          >
+                            Potvrdit
+                          </button>
+                        </div>
                       </>
                     )}
-                    <button
-                      onClick={() => {
-                        if (onConfirm) {
-                          // Update database when confirming settings
-                          onConfirm();
-            
-                          // Set database state to true when submitting time ranges
-                          if (timeRanges.length > 0) {
-                            onToggle(true, timeRanges);
-                          }
-                        }
-                      }}
-                      className="px-3 py-1.5 rounded-md bg-green-600 text-white text-sm font-medium hover:bg-green-700 transition-colors flex items-center justify-center w-full sm:w-auto"
-                    >
-                      {/* <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg> */}
-                      Potvrdit
-                    </button>
                   </div>
                 </div>
               </>
